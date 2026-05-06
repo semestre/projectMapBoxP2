@@ -5,11 +5,10 @@ require("dotenv").config();
 const app = express();
 const PORT = 3000;
 
-// Serve CSS, JS, images, folders, etc.
 app.use(express.static(__dirname));
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "map.html"));
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 app.listen(PORT, () => {
