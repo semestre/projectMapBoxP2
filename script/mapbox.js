@@ -1,8 +1,8 @@
 
 
-// Configurar nuestro token de acceso
+// Token de Mapbox para habilitar el render del mapa.
 mapboxgl.accessToken = "pk.eyJ1IjoianVhbmZyOTciLCJhIjoiY2tkeXgzN2dyMmV1NjJxbjk2em4wbnZ0MiJ9.9ssXDU2u6qBt3V3D0arcMg"
-// Inicializar mapa
+// Inicializa el mapa centrado en León, Gto.
 const map = new mapboxgl.Map({
     container: "map",
     style: "mapbox://styles/mapbox/streets-v11",
@@ -10,18 +10,56 @@ const map = new mapboxgl.Map({
     zoom: 12
 });
 
-// Navegación
+// Controles de zoom/rotación en la esquina del mapa.
 map.addControl(new mapboxgl.NavigationControl());
 
 
-// Load points from backend
+// Pinta los puntos en el panel lateral (lista de puntos y lista temporal en rutas).
+function renderPointsInList(points) {
+    const listaPuntos = document.getElementById("listaPuntos");
+    const listaRutas = document.getElementById("listaRutas");
+
+    if (!listaPuntos || !listaRutas) {
+        return;
+    }
+
+    if (!Array.isArray(points) || points.length === 0) {
+        // Estado vacío cuando el backend no devuelve puntos.
+        listaPuntos.innerHTML = '<p class="text-muted text-center"><i class="bi bi-inbox"></i> Sin puntos registrados</p>';
+        listaRutas.innerHTML = '<p class="text-muted text-center"><i class="bi bi-inbox"></i> Sin datos para mostrar</p>';
+        return;
+    }
+
+    const pointsHtml = points.map((point) => {
+        const description = point.description || "Sin descripción";
+        return `
+            <div class="item-list">
+                <div>
+                    <div class="item-list-nombre">${point.name}</div>
+                    <div class="item-list-desc">${description}</div>
+                </div>
+                <span class="badge badge-success">#${point.id}</span>
+            </div>
+        `;
+    }).join("");
+
+    listaPuntos.innerHTML = pointsHtml;
+    listaRutas.innerHTML = pointsHtml;
+}
+
+
+// Consulta la API de puntos, renderiza la lista lateral y coloca marcadores en el mapa.
 async function loadPoints() {
     try {
         const response = await fetch("/points");
         const points = await response.json();
 
+        // Sincroniza el panel lateral con los datos obtenidos.
+        renderPointsInList(points);
+
         points.forEach(point => {
-            const marker = new mapboxgl.Marker()
+            // Cada punto se representa con un marcador y popup informativo.
+            new mapboxgl.Marker()
                 .setLngLat([point.lng, point.lat])
                 .setPopup(
                     new mapboxgl.Popup().setHTML(`
@@ -38,7 +76,7 @@ async function loadPoints() {
 }
 
 
-// Load markers when map finishes loading
+// Evita dibujar marcadores antes de que Mapbox termine de cargar el mapa.
 map.on("load", () => {
     loadPoints();
 });
