@@ -1,16 +1,15 @@
+// Configurar token Mapbox
+mapboxgl.accessToken = "pk.eyJ1IjoianVhbmZyOTciLCJhIjoiY2tkeXgzN2dyMmV1NjJxbjk2em4wbnZ0MiJ9.9ssXDU2u6qBt3V3D0arcMg";
 
-
-// Token de Mapbox para habilitar el render del mapa.
-mapboxgl.accessToken = "pk.eyJ1IjoianVhbmZyOTciLCJhIjoiY2tkeXgzN2dyMmV1NjJxbjk2em4wbnZ0MiJ9.9ssXDU2u6qBt3V3D0arcMg"
-// Inicializa el mapa centrado en León, Gto.
+// Inicializar mapa
 const map = new mapboxgl.Map({
     container: "map",
     style: "mapbox://styles/mapbox/streets-v11",
-    center: [-101.6845, 21.1234],
+    center: [-101.6845, 21.1234], // León
     zoom: 12
 });
 
-// Controles de zoom/rotación en la esquina del mapa.
+// Controles de navegación
 map.addControl(new mapboxgl.NavigationControl());
 
 // Referencias de marcadores y líneas para poder limpiarlos en cada recarga.
@@ -19,7 +18,7 @@ const routeLines = [];
 const zonePolygons = [];
 
 function clearPointMarkers() {
-    pointMarkers.forEach((marker) => marker.remove());
+    pointMarkers.forEach(marker => marker.remove());
     pointMarkers.length = 0;
 }
 
@@ -59,12 +58,18 @@ function addPointMarker(point) {
 }
 
 
-// Pinta los puntos en el panel lateral (lista de puntos y lista temporal en rutas).
+// ====================
+// RENDER POINT LIST
+// ====================
 function renderPointsInList(points) {
     const listaPuntos = document.getElementById("listaPuntos");
     const listaRutas = document.getElementById("listaRutas");
 
-    if (!listaPuntos || !listaRutas) {
+    if (!listaPuntos || !listaRutas) return;
+
+    if (!points.length) {
+        listaPuntos.innerHTML = "Sin puntos registrados";
+        listaRutas.innerHTML = "Sin datos para mostrar";
         return;
     }
 
@@ -95,31 +100,30 @@ function renderPointsInList(points) {
 
     listaPuntos.innerHTML = pointsHtml;
     listaRutas.innerHTML = pointsHtml;
-    
+
     // Configurar event listeners para los botones de eliminar
     setupDeleteButtons();
 }
 
 
-// Consulta la API de puntos, renderiza la lista lateral y coloca marcadores en el mapa.
+// ====================
+// LOAD POINTS
+// ====================
 async function loadPoints() {
     try {
         const response = await fetch("/points");
 
         if (!response.ok) {
-            throw new Error("No se pudieron obtener los puntos");
+            throw new Error("No se pudieron obtener puntos");
         }
 
         const points = await response.json();
 
-        // Sincroniza el panel lateral con los datos obtenidos.
         renderPointsInList(points);
 
-        // Evita duplicar marcadores cuando se recarga la lista.
         clearPointMarkers();
 
         points.forEach(point => {
-            // Cada punto se representa con un marcador y popup informativo.
             addPointMarker(point);
         });
 
@@ -129,28 +133,72 @@ async function loadPoints() {
 }
 
 
-// Envía el formulario de puntos al backend y recarga datos visibles.
+// ====================
+// LOAD ROUTES
+// ====================
+async function loadRoutes() {
+    try {
+        const response = await fetch("/routes");
+
+        if (!response.ok) {
+            throw new Error("No se pudieron obtener rutas");
+        }
+
+        const routes = await response.json();
+
+        routes.forEach(route => {
+            const coordinates = route.coordinates.map(coord => [
+                coord[1],
+                coord[0]
+            ]);
+
+            // evitar duplicar capas
+            if (map.getLayer(`route-${route.id}`)) {
+                map.removeLayer(`route-${route.id}`);
+                map.removeSource(`route-${route.id}`);
+            }
+
+            map.addLayer({
+                id: `route-${route.id}`,
+                type: "line",
+                source: {
+                    type: "geojson",
+                    data: {
+                        type: "Feature",
+                        geometry: {
+                            type: "LineString",
+                            coordinates: coordinates
+                        }
+                    }
+                },
+                layout: {
+                    "line-join": "round",
+                    "line-cap": "round"
+                },
+                paint: {
+                    "line-color": "#ff0000",
+                    "line-width": 4
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error("Error loading routes:", error);
+    }
+}
+
+
+// ====================
+// FORM SUBMIT
+// ====================
 async function handlePointFormSubmit(event) {
     event.preventDefault();
 
-    const nameInput = document.getElementById("puntosNombre");
-    const descriptionInput = document.getElementById("puntosDesc");
-    const latInput = document.getElementById("puntosLat");
-    const lngInput = document.getElementById("puntosLng");
-
-    const lat = Number.parseFloat(latInput.value);
-    const lng = Number.parseFloat(lngInput.value);
-
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-        alert("Latitud y longitud deben ser números válidos.");
-        return;
-    }
-
     const payload = {
-        name: nameInput.value.trim(),
-        description: descriptionInput.value.trim(),
-        lat,
-        lng
+        name: document.getElementById("puntosNombre").value.trim(),
+        description: document.getElementById("puntosDesc").value.trim(),
+        lat: parseFloat(document.getElementById("puntosLat").value),
+        lng: parseFloat(document.getElementById("puntosLng").value)
     };
 
     try {
@@ -163,14 +211,14 @@ async function handlePointFormSubmit(event) {
         });
 
         if (!response.ok) {
-            throw new Error("No se pudo guardar el punto");
+            throw new Error("No se pudo guardar");
         }
 
         event.target.reset();
-        await loadPoints();
+        loadPoints();
+
     } catch (error) {
-        console.error("Error creating point:", error);
-        alert("Ocurrió un error al guardar el punto.");
+        console.error(error);
     }
 }
 
@@ -178,7 +226,7 @@ async function handlePointFormSubmit(event) {
 // Elimina un punto después de confirmar con el usuario.
 async function handleDeletePoint(pointId) {
     const confirmDelete = confirm("¿Estás seguro de que deseas eliminar este punto?");
-    
+
     if (!confirmDelete) {
         return;
     }
@@ -204,7 +252,7 @@ async function handleDeletePoint(pointId) {
 // Configura los event listeners para los botones de eliminar.
 function setupDeleteButtons() {
     const deleteButtons = document.querySelectorAll(".btn-delete");
-    
+
     deleteButtons.forEach((button) => {
         button.addEventListener("click", (event) => {
             event.stopPropagation();
@@ -224,7 +272,7 @@ function addRouteToMap(route) {
     }
 
     const coordinates = route.coordinates.map(coord => [coord[1], coord[0]]);
-    
+
     const popup = new mapboxgl.Popup()
         .setHTML(`<strong>${route.name}</strong><br>${route.description}`);
 
@@ -346,7 +394,7 @@ async function handleRouteFormSubmit(event) {
 
 async function handleDeleteRoute(routeId) {
     const confirmDelete = confirm("¿Estás seguro de que deseas eliminar esta ruta?");
-    
+
     if (!confirmDelete) {
         return;
     }
@@ -369,7 +417,7 @@ async function handleDeleteRoute(routeId) {
 
 function setupDeleteRouteButtons() {
     const deleteButtons = document.querySelectorAll(".btn-delete-route");
-    
+
     deleteButtons.forEach((button) => {
         button.addEventListener("click", (event) => {
             event.stopPropagation();
@@ -401,7 +449,7 @@ function addZoneToMap(zone) {
     const coordinates = zone.coordinates.map(coord => [coord[1], coord[0]]);
     // Cerrar el polígono agregando la primera coordenada al final
     coordinates.push(coordinates[0]);
-    
+
     const geojsonSource = {
         type: 'geojson',
         data: {
@@ -562,7 +610,7 @@ async function handleZoneFormSubmit(event) {
 
 async function handleDeleteZone(zoneId) {
     const confirmDelete = confirm("¿Estás seguro de que deseas eliminar esta zona?");
-    
+
     if (!confirmDelete) {
         return;
     }
@@ -585,7 +633,7 @@ async function handleDeleteZone(zoneId) {
 
 function setupDeleteZoneButtons() {
     const deleteButtons = document.querySelectorAll(".btn-delete-zone");
-    
+
     deleteButtons.forEach((button) => {
         button.addEventListener("click", (event) => {
             event.stopPropagation();
@@ -607,75 +655,23 @@ function setupZoneForm() {
 
 
 function setupPointForm() {
-    const pointForm = document.getElementById("formPuntos");
+    const form = document.getElementById("formPuntos");
 
-    if (!pointForm) {
-        return;
+    if (form) {
+        form.addEventListener("submit", handlePointFormSubmit);
     }
-
-    pointForm.addEventListener("submit", handlePointFormSubmit);
 }
-
 
 setupPointForm();
 setupRouteForm();
 setupZoneForm();
 
 
-// Evita dibujar marcadores antes de que Mapbox termine de cargar el mapa.
+// ====================
+// MAP LOAD
+// ====================
 map.on("load", () => {
     loadPoints();
     loadRoutes();
     loadZones();
 });
-// Inicializar el mapa
-// const map = new mapboxgl.Map({
-//     container: "map", // El id del div donde se mostrará el mapa
-//     style: "mapbox://styles/mapbox/streets-v11", // Tipo de mapa
-//     center: [-74.5, 40], // Coordenadas de inicio
-//     zoom: 9 // Nivel de zoom
-// });
-
-// // Agregar controles de navegación
-// map.addControl(new mapboxgl.NavigationControl());
-
-// // // Agregar un marcador fijo
-// // const marker = new mapboxgl.Marker()
-// //     .setLngLat([-74.5, 40])
-// //     .addTo(map);
-
-// // Agregar capa de puntos desde un archivo GeoJSON
-// map.on('load', function () {
-//     map.addSource('places', {
-//         'type': 'geojson',
-//         'data': 'https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson'
-//     });
-
-//     // map.addLayer({
-//     //     'id': 'earthquakes',
-//     //     'type': 'circle',
-//     //     'source': 'places',
-//     //     'paint': {
-//     //         'circle-radius': 6,
-//     //         'circle-color': '#ff0000',
-//     //         'circle-stroke-color': '#fff',
-//     //         'circle-stroke-width': 1
-//     //     }
-//     // });
-
-//     // // Cambiar cursor al pasar por encima
-//     // map.on('mouseenter', 'earthquakes', () => map.getCanvas().style.cursor = 'pointer');
-//     // map.on('mouseleave', 'earthquakes', () => map.getCanvas().style.cursor = '');
-
-//     // // Agregar popups al hacer click en un punto
-//     // map.on('click', 'earthquakes', (e) => {
-//     //     const coordinates = e.features[0].geometry.coordinates.slice();
-//     //     const place = e.features[0].properties.place || "Ubicación desconocida";
-//     //     const magnitude = e.features[0].properties.mag || "N/A";
-
-//     //     new mapboxgl.Popup()
-//     //         .setLngLat(coordinates)
-//     //         .setHTML(`<strong>${place}</strong><br>Magnitud: ${magnitude}`)
-//     //         .addTo(map);
-//     // });
-// });

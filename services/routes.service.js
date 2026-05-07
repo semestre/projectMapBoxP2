@@ -3,27 +3,30 @@ class RoutesService {
     this.routes = [
       {
         id: 1,
-        name: "Ruta Centro-Norte",
-        description: "Ruta desde el centro histórico hacia el norte",
-        coordinates: [[21.1234, -101.6845], [21.1350, -101.6902], [21.1450, -101.6950], [21.1550, -101.7000]]
+        name: "School Route",
+        coordinates: [
+          [21.12, -101.68],
+          [21.13, -101.69],
+          [21.14, -101.70]
+        ]
       },
       {
         id: 2,
-        name: "Ruta Comercial",
-        description: "Recorrido por principales centros comerciales",
-        coordinates: [[21.1168, -101.6824], [21.1200, -101.6750], [21.1280, -101.6800], [21.1250, -101.6900]]
+        name: "Downtown Route",
+        coordinates: [
+          [21.125, -101.685],
+          [21.130, -101.690],
+          [21.135, -101.695]
+        ]
       },
       {
         id: 3,
-        name: "Ruta Escolar",
-        description: "Ruta que conecta instituciones educativas",
-        coordinates: [[21.1526, -101.7110], [21.1480, -101.7050], [21.1420, -101.7000], [21.1350, -101.6950]]
-      },
-      {
-        id: 4,
-        name: "Ruta Turística",
-        description: "Recorrido por puntos de interés turístico",
-        coordinates: [[21.1234, -101.6845], [21.1350, -101.6902], [21.1168, -101.6824], [21.1526, -101.7110]]
+        name: "University Transport Route",
+        coordinates: [
+          [21.150, -101.710],
+          [21.155, -101.715],
+          [21.160, -101.720]
+        ]
       }
     ];
   }

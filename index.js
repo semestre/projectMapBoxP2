@@ -38,8 +38,9 @@ const swaggerSpec = swaggerJsdoc(options);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
-// points routes
+// API routes
 app.use("/points", pointsRouter);
+app.use("/routes", routesRouter);
 
 // routes routes
 app.use("/routes", routesRouter);
