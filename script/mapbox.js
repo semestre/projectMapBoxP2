@@ -13,6 +13,28 @@ const map = new mapboxgl.Map({
 // Controles de zoom/rotación en la esquina del mapa.
 map.addControl(new mapboxgl.NavigationControl());
 
+// Referencias de marcadores para poder limpiarlos en cada recarga.
+const pointMarkers = [];
+
+function clearPointMarkers() {
+    pointMarkers.forEach((marker) => marker.remove());
+    pointMarkers.length = 0;
+}
+
+function addPointMarker(point) {
+    const marker = new mapboxgl.Marker()
+        .setLngLat([point.lng, point.lat])
+        .setPopup(
+            new mapboxgl.Popup().setHTML(`
+                <h3>${point.name}</h3>
+                <p>${point.description || "Sin descripción"}</p>
+            `)
+        )
+        .addTo(map);
+
+    pointMarkers.push(marker);
+}
+
 
 // Pinta los puntos en el panel lateral (lista de puntos y lista temporal en rutas).
 function renderPointsInList(points) {
@@ -52,28 +74,88 @@ function renderPointsInList(points) {
 async function loadPoints() {
     try {
         const response = await fetch("/points");
+
+        if (!response.ok) {
+            throw new Error("No se pudieron obtener los puntos");
+        }
+
         const points = await response.json();
 
         // Sincroniza el panel lateral con los datos obtenidos.
         renderPointsInList(points);
 
+        // Evita duplicar marcadores cuando se recarga la lista.
+        clearPointMarkers();
+
         points.forEach(point => {
             // Cada punto se representa con un marcador y popup informativo.
-            new mapboxgl.Marker()
-                .setLngLat([point.lng, point.lat])
-                .setPopup(
-                    new mapboxgl.Popup().setHTML(`
-                        <h3>${point.name}</h3>
-                        <p>${point.description}</p>
-                    `)
-                )
-                .addTo(map);
+            addPointMarker(point);
         });
 
     } catch (error) {
         console.error("Error loading points:", error);
     }
 }
+
+
+// Envía el formulario de puntos al backend y recarga datos visibles.
+async function handlePointFormSubmit(event) {
+    event.preventDefault();
+
+    const nameInput = document.getElementById("puntosNombre");
+    const descriptionInput = document.getElementById("puntosDesc");
+    const latInput = document.getElementById("puntosLat");
+    const lngInput = document.getElementById("puntosLng");
+
+    const lat = Number.parseFloat(latInput.value);
+    const lng = Number.parseFloat(lngInput.value);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+        alert("Latitud y longitud deben ser números válidos.");
+        return;
+    }
+
+    const payload = {
+        name: nameInput.value.trim(),
+        description: descriptionInput.value.trim(),
+        lat,
+        lng
+    };
+
+    try {
+        const response = await fetch("/points", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error("No se pudo guardar el punto");
+        }
+
+        event.target.reset();
+        await loadPoints();
+    } catch (error) {
+        console.error("Error creating point:", error);
+        alert("Ocurrió un error al guardar el punto.");
+    }
+}
+
+
+function setupPointForm() {
+    const pointForm = document.getElementById("formPuntos");
+
+    if (!pointForm) {
+        return;
+    }
+
+    pointForm.addEventListener("submit", handlePointFormSubmit);
+}
+
+
+setupPointForm();
 
 
 // Evita dibujar marcadores antes de que Mapbox termine de cargar el mapa.
