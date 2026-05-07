@@ -69,12 +69,10 @@ router.get("/:id", async (req, res) => {
  *             properties:
  *               name:
  *                 type: string
+ *               description:
+ *                 type: string
  *               coordinates:
  *                 type: array
- *                 items:
- *                   type: array
- *                   items:
- *                     type: number
  *     responses:
  *       201:
  *         description: Route created
@@ -108,9 +106,7 @@ router.patch("/:id", async (req, res) => {
 
   try {
     const updatedRoute = await service.update(id, req.body);
-
     res.json(updatedRoute);
-
   } catch (error) {
     res.status(404).json({
       message: error.message
@@ -147,7 +143,6 @@ router.delete("/:id", async (req, res) => {
       message: "Route deleted successfully",
       data: deletedRoute
     });
-
   } catch (error) {
     res.status(404).json({
       message: error.message
