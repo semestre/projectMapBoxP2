@@ -273,14 +273,44 @@ function addRouteToMap(route) {
 
     const coordinates = route.coordinates.map(coord => [coord[1], coord[0]]);
 
-    const popup = new mapboxgl.Popup()
-        .setHTML(`<strong>${route.name}</strong><br>${route.description}`);
+    // Evitar duplicar capas
+    if (map.getLayer(`route-${route.id}`)) {
+        map.removeLayer(`route-${route.id}`);
+        map.removeSource(`route-${route.id}`);
+    }
 
-    // Crear un elemento personalizado para representar la ruta
+    // Agregar la línea de la ruta
+    map.addLayer({
+        id: `route-${route.id}`,
+        type: "line",
+        source: {
+            type: "geojson",
+            data: {
+                type: "Feature",
+                geometry: {
+                    type: "LineString",
+                    coordinates: coordinates
+                }
+            }
+        },
+        layout: {
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        paint: {
+            "line-color": "#ff0000",
+            "line-width": 4
+        }
+    });
+
+    // Agregar marcador en el punto de inicio de la ruta
+    const popup = new mapboxgl.Popup()
+        .setHTML(`<strong>${route.name}</strong><br>${route.description || "Sin descripción"}`);
+
     const el = document.createElement('div');
     el.style.width = '20px';
     el.style.height = '20px';
-    el.style.backgroundColor = '#3b82f6';
+    el.style.backgroundColor = '#ff0000';
     el.style.borderRadius = '50%';
     el.style.border = '2px solid white';
     el.style.cursor = 'pointer';
