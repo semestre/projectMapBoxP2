@@ -1,18 +1,21 @@
-// Configurar nuestro token de acceso
-mapboxgl.accessToken = "YOUR_TOKEN";
+// Configurar token Mapbox
+mapboxgl.accessToken = "pk.eyJ1IjoianVhbmZyOTciLCJhIjoiY2tkeXgzN2dyMmV1NjJxbjk2em4wbnZ0MiJ9.9ssXDU2u6qBt3V3D0arcMg";
 
 // Inicializar mapa
 const map = new mapboxgl.Map({
     container: "map",
     style: "mapbox://styles/mapbox/streets-v11",
-    center: [-101.6845, 21.1234],
+    center: [-101.6845, 21.1234], // León
     zoom: 12
 });
 
-// Navegación
+// Controles de navegación
 map.addControl(new mapboxgl.NavigationControl());
 
-// Referencias de marcadores
+
+// ====================
+// MARKERS
+// ====================
 const pointMarkers = [];
 
 function clearPointMarkers() {
@@ -36,6 +39,36 @@ function addPointMarker(point) {
 
 
 // ====================
+// RENDER POINT LIST
+// ====================
+function renderPointsInList(points) {
+    const listaPuntos = document.getElementById("listaPuntos");
+    const listaRutas = document.getElementById("listaRutas");
+
+    if (!listaPuntos || !listaRutas) return;
+
+    if (!points.length) {
+        listaPuntos.innerHTML = "Sin puntos registrados";
+        listaRutas.innerHTML = "Sin datos para mostrar";
+        return;
+    }
+
+    const html = points.map(point => `
+        <div class="item-list">
+            <div>
+                <div class="item-list-nombre">${point.name}</div>
+                <div class="item-list-desc">${point.description || "Sin descripción"}</div>
+            </div>
+            <span class="badge badge-success">#${point.id}</span>
+        </div>
+    `).join("");
+
+    listaPuntos.innerHTML = html;
+    listaRutas.innerHTML = html;
+}
+
+
+// ====================
 // LOAD POINTS
 // ====================
 async function loadPoints() {
@@ -43,18 +76,15 @@ async function loadPoints() {
         const response = await fetch("/points");
 
         if (!response.ok) {
-            throw new Error("No se pudieron obtener los puntos");
+            throw new Error("No se pudieron obtener puntos");
         }
 
         const points = await response.json();
 
-        // Actualizar lista lateral
         renderPointsInList(points);
 
-        // Limpiar marcadores anteriores
         clearPointMarkers();
 
-        // Agregar nuevos marcadores
         points.forEach(point => {
             addPointMarker(point);
         });
@@ -71,13 +101,24 @@ async function loadPoints() {
 async function loadRoutes() {
     try {
         const response = await fetch("/routes");
+
+        if (!response.ok) {
+            throw new Error("No se pudieron obtener rutas");
+        }
+
         const routes = await response.json();
 
         routes.forEach(route => {
             const coordinates = route.coordinates.map(coord => [
-                coord[1], // lng
-                coord[0]  // lat
+                coord[1],
+                coord[0]
             ]);
+
+            // evitar duplicar capas
+            if (map.getLayer(`route-${route.id}`)) {
+                map.removeLayer(`route-${route.id}`);
+                map.removeSource(`route-${route.id}`);
+            }
 
             map.addLayer({
                 id: `route-${route.id}`,
@@ -110,29 +151,16 @@ async function loadRoutes() {
 
 
 // ====================
-// HANDLE FORM SUBMIT
+// FORM SUBMIT
 // ====================
 async function handlePointFormSubmit(event) {
     event.preventDefault();
 
-    const nameInput = document.getElementById("puntosNombre");
-    const descriptionInput = document.getElementById("puntosDesc");
-    const latInput = document.getElementById("puntosLat");
-    const lngInput = document.getElementById("puntosLng");
-
-    const lat = Number.parseFloat(latInput.value);
-    const lng = Number.parseFloat(lngInput.value);
-
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-        alert("Latitud y longitud deben ser números válidos.");
-        return;
-    }
-
     const payload = {
-        name: nameInput.value.trim(),
-        description: descriptionInput.value.trim(),
-        lat,
-        lng
+        name: document.getElementById("puntosNombre").value.trim(),
+        description: document.getElementById("puntosDesc").value.trim(),
+        lat: parseFloat(document.getElementById("puntosLat").value),
+        lng: parseFloat(document.getElementById("puntosLng").value)
     };
 
     try {
@@ -145,15 +173,14 @@ async function handlePointFormSubmit(event) {
         });
 
         if (!response.ok) {
-            throw new Error("No se pudo guardar el punto");
+            throw new Error("No se pudo guardar");
         }
 
         event.target.reset();
-        await loadPoints();
+        loadPoints();
 
     } catch (error) {
-        console.error("Error creating point:", error);
-        alert("Ocurrió un error al guardar el punto.");
+        console.error(error);
     }
 }
 
@@ -162,13 +189,11 @@ async function handlePointFormSubmit(event) {
 // SETUP FORM
 // ====================
 function setupPointForm() {
-    const pointForm = document.getElementById("formPuntos");
+    const form = document.getElementById("formPuntos");
 
-    if (!pointForm) {
-        return;
+    if (form) {
+        form.addEventListener("submit", handlePointFormSubmit);
     }
-
-    pointForm.addEventListener("submit", handlePointFormSubmit);
 }
 
 setupPointForm();
