@@ -1,5 +1,5 @@
 // Configurar nuestro token de acceso
-mapboxgl.accessToken = "pk.eyJ1IjoianVhbmZyOTciLCJhIjoiY2tkeXgzN2dyMmV1NjJxbjk2em4wbnZ0MiJ9.9ssXDU2u6qBt3V3D0arcMg";
+mapboxgl.accessToken = "YOUR_TOKEN";
 
 // Inicializar mapa
 const map = new mapboxgl.Map({
@@ -12,6 +12,28 @@ const map = new mapboxgl.Map({
 // Navegación
 map.addControl(new mapboxgl.NavigationControl());
 
+// Referencias de marcadores
+const pointMarkers = [];
+
+function clearPointMarkers() {
+    pointMarkers.forEach(marker => marker.remove());
+    pointMarkers.length = 0;
+}
+
+function addPointMarker(point) {
+    const marker = new mapboxgl.Marker()
+        .setLngLat([point.lng, point.lat])
+        .setPopup(
+            new mapboxgl.Popup().setHTML(`
+                <h3>${point.name}</h3>
+                <p>${point.description || "Sin descripción"}</p>
+            `)
+        )
+        .addTo(map);
+
+    pointMarkers.push(marker);
+}
+
 
 // ====================
 // LOAD POINTS
@@ -19,20 +41,22 @@ map.addControl(new mapboxgl.NavigationControl());
 async function loadPoints() {
     try {
         const response = await fetch("/points");
+
+        if (!response.ok) {
+            throw new Error("No se pudieron obtener los puntos");
+        }
+
         const points = await response.json();
 
+        // Actualizar lista lateral
+        renderPointsInList(points);
+
+        // Limpiar marcadores anteriores
+        clearPointMarkers();
+
+        // Agregar nuevos marcadores
         points.forEach(point => {
-
-            new mapboxgl.Marker()
-                .setLngLat([point.lng, point.lat])
-                .setPopup(
-                    new mapboxgl.Popup().setHTML(`
-                        <h3>${point.name}</h3>
-                        <p>${point.description}</p>
-                    `)
-                )
-                .addTo(map);
-
+            addPointMarker(point);
         });
 
     } catch (error) {
@@ -46,19 +70,15 @@ async function loadPoints() {
 // ====================
 async function loadRoutes() {
     try {
-
         const response = await fetch("/routes");
         const routes = await response.json();
 
         routes.forEach(route => {
-
-            // Convert coordinates
             const coordinates = route.coordinates.map(coord => [
                 coord[1], // lng
                 coord[0]  // lat
             ]);
 
-            // Draw line
             map.addLayer({
                 id: `route-${route.id}`,
                 type: "line",
@@ -81,13 +101,77 @@ async function loadRoutes() {
                     "line-width": 4
                 }
             });
-
         });
 
     } catch (error) {
         console.error("Error loading routes:", error);
     }
 }
+
+
+// ====================
+// HANDLE FORM SUBMIT
+// ====================
+async function handlePointFormSubmit(event) {
+    event.preventDefault();
+
+    const nameInput = document.getElementById("puntosNombre");
+    const descriptionInput = document.getElementById("puntosDesc");
+    const latInput = document.getElementById("puntosLat");
+    const lngInput = document.getElementById("puntosLng");
+
+    const lat = Number.parseFloat(latInput.value);
+    const lng = Number.parseFloat(lngInput.value);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+        alert("Latitud y longitud deben ser números válidos.");
+        return;
+    }
+
+    const payload = {
+        name: nameInput.value.trim(),
+        description: descriptionInput.value.trim(),
+        lat,
+        lng
+    };
+
+    try {
+        const response = await fetch("/points", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error("No se pudo guardar el punto");
+        }
+
+        event.target.reset();
+        await loadPoints();
+
+    } catch (error) {
+        console.error("Error creating point:", error);
+        alert("Ocurrió un error al guardar el punto.");
+    }
+}
+
+
+// ====================
+// SETUP FORM
+// ====================
+function setupPointForm() {
+    const pointForm = document.getElementById("formPuntos");
+
+    if (!pointForm) {
+        return;
+    }
+
+    pointForm.addEventListener("submit", handlePointFormSubmit);
+}
+
+setupPointForm();
 
 
 // ====================
