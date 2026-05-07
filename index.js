@@ -6,6 +6,8 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerJsdoc = require("swagger-jsdoc");
 
 const pointsRouter = require("./routes/points.route");
+const routesRouter = require("./routes/routes.route");
+const zonesRouter = require("./routes/zones.route");
 
 const app = express();
 const PORT = 3000;
@@ -38,6 +40,12 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // points routes
 app.use("/points", pointsRouter);
+
+// routes routes
+app.use("/routes", routesRouter);
+
+// zones routes
+app.use("/zones", zonesRouter);
 
 
 // frontend route

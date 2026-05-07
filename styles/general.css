@@ -376,7 +376,14 @@ h1, h2, h3, h4, h5, h6 {
 
 .item-list-acciones {
     display: flex;
-    gap: 5px;
+    gap: 8px;
+    align-items: center;
+}
+
+.item-list-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 
 .btn-sm {
@@ -391,6 +398,21 @@ h1, h2, h3, h4, h5, h6 {
     background: rgba(250, 204, 21, 0.3);
     border: 1px solid rgba(250, 204, 21, 0.5);
     color: #fcd34d;
+}
+
+.btn-sm.btn-delete {
+    background: rgba(239, 68, 68, 0.3);
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    color: #fca5a5;
+    padding: 6px 8px;
+}
+
+.btn-sm.btn-delete:hover {
+    background: rgba(239, 68, 68, 0.6);
+    border-color: rgba(239, 68, 68, 0.8);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    transform: scale(1.05);
 }
 
 .btn-sm.btn-warning:hover {
