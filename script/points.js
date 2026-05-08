@@ -146,25 +146,43 @@ async function handleDeletePoint(pointId) {
   }
 }
 
+
+
+
+
+
+let currentPointId = null;
+
 async function handleEditPoint(pointId) {
-  const newName = prompt("Nuevo nombre:");
-  const newDescription = prompt("Nueva descripción:");
-  const newLat = prompt("Nueva latitud:");
-  const newLng = prompt("Nueva longitud:");
+  try {
+    const response = await fetch(`/points/${pointId}`);
+    const point = await response.json();
 
-  if (!newName || !newLat || !newLng) {
-    return;
+    currentPointId = pointId;
+
+    document.getElementById("editName").value = point.name;
+    document.getElementById("editDescription").value = point.description;
+    document.getElementById("editLat").value = point.lat;
+    document.getElementById("editLng").value = point.lng;
+
+    document.getElementById("editPointModal").style.display = "block";
+
+  } catch (error) {
+    console.error(error);
   }
+}
 
+
+async function saveEditedPoint() {
   const payload = {
-    name: newName,
-    description: newDescription,
-    lat: parseFloat(newLat),
-    lng: parseFloat(newLng)
+    name: document.getElementById("editName").value,
+    description: document.getElementById("editDescription").value,
+    lat: parseFloat(document.getElementById("editLat").value),
+    lng: parseFloat(document.getElementById("editLng").value)
   };
 
   try {
-    const response = await fetch(`/points/${pointId}`, {
+    const response = await fetch(`/points/${currentPointId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json"
@@ -173,14 +191,20 @@ async function handleEditPoint(pointId) {
     });
 
     if (!response.ok) {
-      throw new Error("No se pudo editar el punto");
+      throw new Error("No se pudo editar");
     }
 
-    await loadPoints();
+    document.getElementById("editPointModal").style.display = "none";
+
+    loadPoints();
 
   } catch (error) {
-    console.error("Error editing point:", error);
+    console.error(error);
   }
+}
+
+function closeModal() {
+  document.getElementById("editPointModal").style.display = "none";
 }
 
 
@@ -218,6 +242,15 @@ function setupPointForm() {
 }
 
 setupPointForm();
+
+document
+  .getElementById("savePointChanges")
+  ?.addEventListener("click", saveEditedPoint);
+
+document
+  .getElementById("closeModal")
+  ?.addEventListener("click", closeModal);
+
 
 map.on("load", () => {
   loadPoints();
