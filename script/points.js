@@ -61,7 +61,6 @@ function renderPointsInList(points) {
   }).join("");
 
   listaPuntos.innerHTML = pointsHtml;
-  listaRutas.innerHTML = pointsHtml;
 
   // Configurar event listeners para los botones de eliminar
   setupDeleteButtons();
