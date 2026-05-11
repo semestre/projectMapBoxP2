@@ -108,10 +108,10 @@ function renderZonesInList(zones) {
                 <div class="item-list-actions">
                     <span class="badge badge-warning">#${zone.id}</span>
                     <button
-                      class="btn btn-sm btn-warning btn-zone-edit"
+                      class="btn btn-sm btn-info btn-zone-edit"
                       data-zone-id="${zone.id}"
                       title="Editar zona">
-                      ✏️
+                      <i class="bi bi-pencil-square"></i>
                     </button>
 
                     <button
@@ -229,10 +229,12 @@ async function handleEditZone(zoneId) {
         currentZoneId = zoneId;
 
         document.getElementById("editZoneName").value = zone.name;
+        document.getElementById("editZoneDescription").value = zone.description || "";
         document.getElementById("editZoneCoordinates").value =
             JSON.stringify(zone.coordinates);
 
-        document.getElementById("editZoneModal").style.display = "block";
+        const modal = new bootstrap.Modal(document.getElementById("editZoneModal"));
+        modal.show();
 
     } catch (error) {
         console.error("Error loading zone:", error);
@@ -243,6 +245,7 @@ async function saveEditedZone() {
     try {
         const payload = {
             name: document.getElementById("editZoneName").value,
+            description: document.getElementById("editZoneDescription").value,
             coordinates: JSON.parse(
                 document.getElementById("editZoneCoordinates").value
             )
@@ -260,7 +263,8 @@ async function saveEditedZone() {
             throw new Error("Could not update zone");
         }
 
-        document.getElementById("editZoneModal").style.display = "none";
+        const modal = bootstrap.Modal.getInstance(document.getElementById("editZoneModal"));
+        modal.hide();
 
         loadZones();
 
@@ -270,7 +274,8 @@ async function saveEditedZone() {
 }
 
 function closeZoneModal() {
-    document.getElementById("editZoneModal").style.display = "none";
+    const modal = bootstrap.Modal.getInstance(document.getElementById("editZoneModal"));
+    if (modal) modal.hide();
 }
 
 
@@ -307,17 +312,18 @@ function setupZoneForm() {
   zoneForm.addEventListener("submit", handleZoneFormSubmit);
 }
 
-document
-    .getElementById("saveZoneChanges")
-    ?.addEventListener("click", saveEditedZone);
-
-document
-    .getElementById("closeZoneModal")
-    ?.addEventListener("click", closeZoneModal);
-
-
-
 setupZoneForm();
+
+const closeZoneModalBtn = document.getElementById("closeZoneModal");
+const saveZoneChangesBtn = document.getElementById("saveZoneChanges");
+
+if (closeZoneModalBtn) {
+  closeZoneModalBtn.addEventListener("click", closeZoneModal);
+}
+
+if (saveZoneChangesBtn) {
+  saveZoneChangesBtn.addEventListener("click", saveEditedZone);
+}
 
 map.on("load", () => {
   loadZones();

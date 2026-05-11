@@ -136,13 +136,11 @@ function renderRoutesInList(routes) {
                 </div>
                 <div class="item-list-actions">
                     <span class="badge badge-info">#${route.id}</span>
+                    <button class="btn btn-sm btn-info btn-route-edit" data-route-id="${route.id}" title="Editar ruta">
+                      <i class="bi bi-pencil-square"></i>
+                    </button>
                     <button class="btn btn-sm btn-danger btn-delete-route" data-route-id="${route.id}" title="Eliminar ruta">
                         <i class="bi bi-trash"></i>
-                    </button>
-                    <button
-                      class="btn btn-warning btn-route-edit"
-                      data-route-id="${route.id}">
-                      ✏️
                     </button>
                 </div>
             </div>
@@ -275,11 +273,12 @@ async function handleEditRoute(routeId) {
     currentRouteId = routeId;
 
     document.getElementById("editRouteName").value = route.name;
-
+    document.getElementById("editRouteDescription").value = route.description || "";
     document.getElementById("editRouteCoordinates").value =
       JSON.stringify(route.coordinates);
 
-    document.getElementById("editRouteModal").style.display = "block";
+    const modal = new bootstrap.Modal(document.getElementById("editRouteModal"));
+    modal.show();
 
   } catch (error) {
     console.error("Error loading route:", error);
@@ -290,6 +289,7 @@ async function saveEditedRoute() {
   try {
     const payload = {
       name: document.getElementById("editRouteName").value,
+      description: document.getElementById("editRouteDescription").value,
       coordinates: JSON.parse(
         document.getElementById("editRouteCoordinates").value
       )
@@ -307,7 +307,8 @@ async function saveEditedRoute() {
       throw new Error("Could not update route");
     }
 
-    document.getElementById("editRouteModal").style.display = "none";
+    const modal = bootstrap.Modal.getInstance(document.getElementById("editRouteModal"));
+    modal.hide();
 
     loadRoutes();
 
@@ -317,18 +318,9 @@ async function saveEditedRoute() {
 }
 
 function closeRouteModal() {
-  document.getElementById("editRouteModal").style.display = "none";
+  const modal = bootstrap.Modal.getInstance(document.getElementById("editRouteModal"));
+  if (modal) modal.hide();
 }
-
-document
-  .getElementById("saveRouteChanges")
-  ?.addEventListener("click", saveEditedRoute);
-
-document
-  .getElementById("closeRouteModal")
-  ?.addEventListener("click", closeRouteModal);
-
-
 
 function setupRouteEditButtons() {
   const buttons = document.querySelectorAll(".btn-route-edit");
@@ -342,6 +334,18 @@ function setupRouteEditButtons() {
 }
 
 setupRouteForm();
+setupRouteEditButtons();
+
+const closeRouteModalBtn = document.getElementById("closeRouteModal");
+const saveRouteChangesBtn = document.getElementById("saveRouteChanges");
+
+if (closeRouteModalBtn) {
+  closeRouteModalBtn.addEventListener("click", closeRouteModal);
+}
+
+if (saveRouteChangesBtn) {
+  saveRouteChangesBtn.addEventListener("click", saveEditedRoute);
+}
 
 map.on("load", () => {
   loadRoutes();

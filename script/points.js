@@ -48,8 +48,8 @@ function renderPointsInList(points) {
                 </div>
                 <div class="item-list-actions">
                     <span class="badge badge-success">#${point.id}</span>
-                  <button class="btn btn-sm btn-warning btn-edit" data-point-id="${point.id}" title="Editar punto">
-                      ✏️
+                  <button class="btn btn-sm btn-info btn-edit" data-point-id="${point.id}" title="Editar punto">
+                      <i class="bi bi-pencil-square"></i>
                   </button>
 
                   <button class="btn btn-sm btn-danger btn-delete" data-point-id="${point.id}" title="Eliminar punto">
@@ -164,7 +164,8 @@ async function handleEditPoint(pointId) {
     document.getElementById("editLat").value = point.lat;
     document.getElementById("editLng").value = point.lng;
 
-    document.getElementById("editPointModal").style.display = "block";
+    const modal = new bootstrap.Modal(document.getElementById("editPointModal"));
+    modal.show();
 
   } catch (error) {
     console.error(error);
@@ -193,7 +194,8 @@ async function saveEditedPoint() {
       throw new Error("No se pudo editar");
     }
 
-    document.getElementById("editPointModal").style.display = "none";
+    const modal = bootstrap.Modal.getInstance(document.getElementById("editPointModal"));
+    modal.hide();
 
     loadPoints();
 
@@ -203,7 +205,8 @@ async function saveEditedPoint() {
 }
 
 function closeModal() {
-  document.getElementById("editPointModal").style.display = "none";
+  const modal = bootstrap.Modal.getInstance(document.getElementById("editPointModal"));
+  if (modal) modal.hide();
 }
 
 
@@ -242,14 +245,16 @@ function setupPointForm() {
 
 setupPointForm();
 
-document
-  .getElementById("savePointChanges")
-  ?.addEventListener("click", saveEditedPoint);
+const closeModalBtn = document.getElementById("closeModal");
+const savePointChangesBtn = document.getElementById("savePointChanges");
 
-document
-  .getElementById("closeModal")
-  ?.addEventListener("click", closeModal);
+if (closeModalBtn) {
+  closeModalBtn.addEventListener("click", closeModal);
+}
 
+if (savePointChangesBtn) {
+  savePointChangesBtn.addEventListener("click", saveEditedPoint);
+}
 
 map.on("load", () => {
   loadPoints();
