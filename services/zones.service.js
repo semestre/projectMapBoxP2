@@ -24,6 +24,12 @@ class ZonesService {
         name: "Zona Residencial",
         description: "Zona residencial de expansión urbana",
         coordinates: [[21.1450, -101.6600], [21.1500, -101.6550], [21.1550, -101.6650], [21.1500, -101.6750]]
+      },
+      {
+        id: 5,
+        name: "Zona Parque Metropolitano",
+        description: "Zona de prueba alrededor del Parque Metropolitano de León",
+        coordinates: [[21.1105, -101.7045], [21.1165, -101.6995], [21.1145, -101.6905], [21.1085, -101.6925]]
       }
     ];
   }

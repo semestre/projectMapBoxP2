@@ -167,77 +167,116 @@
   </main>
 
 
-  <div id="editPointModal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <h2>Edit Point</h2>
-
-      <input type="text" id="editName" placeholder="Name">
-      <input type="text" id="editDescription" placeholder="Description">
-      <input type="number" id="editLat" placeholder="Latitude">
-      <input type="number" id="editLng" placeholder="Longitude">
-
-      <br><br>
-
-      <button id="savePointChanges">Save</button>
-      <button id="closeModal">Cancel</button>
+  <!-- MODAL EDITAR PUNTO -->
+  <div id="editPointModal" class="modal fade" tabindex="-1" aria-labelledby="editPointLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="editPointLabel">
+            <i class="bi bi-pencil-square"></i> Editar Punto
+          </h5>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="editName" class="form-label"><i class="bi bi-tag"></i> Nombre</label>
+            <input type="text" class="form-control" id="editName" placeholder="Nombre del punto">
+          </div>
+          <div class="mb-3">
+            <label for="editDescription" class="form-label"><i class="bi bi-chat-dots"></i> Descripción</label>
+            <textarea class="form-control" id="editDescription" placeholder="Descripción del punto" rows="2"></textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="editLat" class="form-label"><i class="bi bi-crosshair2"></i> Latitud</label>
+              <input type="number" class="form-control" id="editLat" step="0.0001" placeholder="21.1234">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="editLng" class="form-label"><i class="bi bi-crosshair2"></i> Longitud</label>
+              <input type="number" class="form-control" id="editLng" step="0.0001" placeholder="-101.68">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" id="closeModal">
+            <i class="bi bi-x-circle"></i> Cancelar
+          </button>
+          <button type="button" class="btn btn-success" id="savePointChanges">
+            <i class="bi bi-check-circle"></i> Guardar
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
-
-
-  <div id="editPointModal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <h2>Edit Point</h2>
-
-      <input type="text" id="editName" placeholder="Name">
-      <input type="text" id="editDescription" placeholder="Description">
-      <input type="number" id="editLat" placeholder="Latitude">
-      <input type="number" id="editLng" placeholder="Longitude">
-
-      <br><br>
-
-      <button id="savePointChanges">Save</button>
-      <button id="closeModal">Cancel</button>
+  <!-- MODAL EDITAR RUTA -->
+  <div id="editRouteModal" class="modal fade" tabindex="-1" aria-labelledby="editRouteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="editRouteLabel">
+            <i class="bi bi-pencil-square"></i> Editar Ruta
+          </h5>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="editRouteName" class="form-label"><i class="bi bi-tag"></i> Nombre de Ruta</label>
+            <input type="text" class="form-control" id="editRouteName" placeholder="Nombre de la ruta">
+          </div>
+          <div class="mb-3">
+            <label for="editRouteDescription" class="form-label"><i class="bi bi-chat-dots"></i> Descripción</label>
+            <textarea class="form-control" id="editRouteDescription" placeholder="Descripción de la ruta" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="editRouteCoordinates" class="form-label"><i class="bi bi-code-square"></i> Coordenadas (JSON)</label>
+            <small class="text-muted d-block mb-2">Formato: [[lat, lng], [lat, lng]]</small>
+            <textarea class="form-control" id="editRouteCoordinates" placeholder='[[21.12,-101.68],[21.13,-101.69]]' rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" id="closeRouteModal">
+            <i class="bi bi-x-circle"></i> Cancelar
+          </button>
+          <button type="button" class="btn btn-success" id="saveRouteChanges">
+            <i class="bi bi-check-circle"></i> Guardar
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
-
-
-  <div id="editRouteModal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <h2>Edit Route</h2>
-
-      <input type="text" id="editRouteName" placeholder="Route name">
-
-      <textarea id="editRouteCoordinates" placeholder='[[21.12,-101.68],[21.13,-101.69]]'>
-    </textarea>
-
-      <br><br>
-
-      <button id="saveRouteChanges">
-        Save
-      </button>
-
-      <button id="closeRouteModal">
-        Cancel
-      </button>
-    </div>
-  </div>
-
-
-  <div id="editZoneModal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <h2>Edit Zone</h2>
-
-      <input type="text" id="editZoneName" placeholder="Zone name">
-
-      <textarea id="editZoneCoordinates" placeholder='[[21.12,-101.68],[21.13,-101.69],[21.14,-101.67]]'>
-      </textarea>
-
-      <br><br>
-
-      <button id="saveZoneChanges">Save</button>
-      <button id="closeZoneModal">Cancel</button>
+  <!-- MODAL EDITAR ZONA -->
+  <div id="editZoneModal" class="modal fade" tabindex="-1" aria-labelledby="editZoneLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="editZoneLabel">
+            <i class="bi bi-pencil-square"></i> Editar Zona
+          </h5>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="editZoneName" class="form-label"><i class="bi bi-tag"></i> Nombre de Zona</label>
+            <input type="text" class="form-control" id="editZoneName" placeholder="Nombre de la zona">
+          </div>
+          <div class="mb-3">
+            <label for="editZoneDescription" class="form-label"><i class="bi bi-chat-dots"></i> Descripción</label>
+            <textarea class="form-control" id="editZoneDescription" placeholder="Descripción de la zona" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="editZoneCoordinates" class="form-label"><i class="bi bi-code-square"></i> Coordenadas (JSON)</label>
+            <small class="text-muted d-block mb-2">Formato: [[lat, lng], [lat, lng], [lat, lng]]</small>
+            <textarea class="form-control" id="editZoneCoordinates" placeholder='[[21.12,-101.68],[21.13,-101.69],[21.14,-101.67]]' rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" id="closeZoneModal">
+            <i class="bi bi-x-circle"></i> Cancelar
+          </button>
+          <button type="button" class="btn btn-success" id="saveZoneChanges">
+            <i class="bi bi-check-circle"></i> Guardar
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
