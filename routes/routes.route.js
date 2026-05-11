@@ -95,6 +95,19 @@ router.post("/", async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               coordinates:
+ *                 type: array
  *     responses:
  *       200:
  *         description: Route updated

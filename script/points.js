@@ -1,11 +1,14 @@
+// Marcadores activos de puntos en el mapa.
 const pointMarkers = [];
 
 function clearPointMarkers() {
+  // Elimina los marcadores actuales antes de volver a pintar.
   pointMarkers.forEach(marker => marker.remove());
   pointMarkers.length = 0;
 }
 
 function addPointMarker(point) {
+  // Crea un marcador con popup para mostrar el punto en el mapa.
   const marker = new mapboxgl.Marker()
     .setLngLat([point.lng, point.lat])
     .setPopup(
@@ -38,11 +41,12 @@ function renderPointsInList(points) {
     return;
   }
 
+  // Construye la lista lateral con acciones de editar y eliminar.
   const pointsHtml = points.map((point) => {
     const description = point.description || "Sin descripción";
     return `
-            <div class="item-list">
-                <div>
+            <div class="item-list" data-point-lat="${point.lat}" data-point-lng="${point.lng}">
+                <div class="item-info">
                     <div class="item-list-nombre">${point.name}</div>
                     <div class="item-list-desc">${description}</div>
                 </div>
@@ -62,6 +66,24 @@ function renderPointsInList(points) {
 
   listaPuntos.innerHTML = pointsHtml;
 
+  // Agregar event listeners a los items para hacer zoom al clickear
+  const itemLists = listaPuntos.querySelectorAll('.item-list');
+  itemLists.forEach(item => {
+    item.addEventListener('click', (event) => {
+      // No hacer zoom si se clickea un botón
+      if (event.target.closest('.item-list-actions')) {
+        return;
+      }
+      
+      const lat = parseFloat(item.getAttribute('data-point-lat'));
+      const lng = parseFloat(item.getAttribute('data-point-lng'));
+      
+      if (!isNaN(lat) && !isNaN(lng) && typeof zoomToPoint === 'function') {
+        zoomToPoint(lat, lng, 16);
+      }
+    });
+  });
+
   // Configurar event listeners para los botones de eliminar
   setupDeleteButtons();
   setupEditButtons();
@@ -69,6 +91,7 @@ function renderPointsInList(points) {
 
 async function loadPoints() {
   try {
+    // Obtiene los puntos del backend y sincroniza lista + mapa.
     const response = await fetch("/points");
 
     if (!response.ok) {
@@ -93,6 +116,7 @@ async function loadPoints() {
 async function handlePointFormSubmit(event) {
   event.preventDefault();
 
+  // Toma los datos del formulario para crear un nuevo punto.
   const payload = {
     name: document.getElementById("puntosNombre").value.trim(),
     description: document.getElementById("puntosDesc").value.trim(),
@@ -122,6 +146,7 @@ async function handlePointFormSubmit(event) {
 }
 
 async function handleDeletePoint(pointId) {
+  // Pide confirmación antes de eliminar el punto.
   const confirmDelete = confirm("¿Estás seguro de que deseas eliminar este punto?");
 
   if (!confirmDelete) {
@@ -154,6 +179,7 @@ let currentPointId = null;
 
 async function handleEditPoint(pointId) {
   try {
+    // Carga el punto seleccionado para mostrarlo en el modal de edición.
     const response = await fetch(`/points/${pointId}`);
     const point = await response.json();
 
@@ -174,6 +200,7 @@ async function handleEditPoint(pointId) {
 
 
 async function saveEditedPoint() {
+  // Envía al backend los cambios editados desde el modal.
   const payload = {
     name: document.getElementById("editName").value,
     description: document.getElementById("editDescription").value,
@@ -205,12 +232,14 @@ async function saveEditedPoint() {
 }
 
 function closeModal() {
+  // Cierra el modal de edición si está abierto.
   const modal = bootstrap.Modal.getInstance(document.getElementById("editPointModal"));
   if (modal) modal.hide();
 }
 
 
 function setupDeleteButtons() {
+  // Conecta los botones de eliminar de la lista renderizada.
   const deleteButtons = document.querySelectorAll(".btn-delete");
 
   deleteButtons.forEach((button) => {
@@ -223,6 +252,7 @@ function setupDeleteButtons() {
 }
 
 function setupEditButtons() {
+  // Conecta los botones de edición de la lista renderizada.
   const editButtons = document.querySelectorAll(".btn-edit");
 
   editButtons.forEach((button) => {
@@ -239,10 +269,12 @@ function setupPointForm() {
   const form = document.getElementById("formPuntos");
 
   if (form) {
+    // Activa el submit del formulario de creación de puntos.
     form.addEventListener("submit", handlePointFormSubmit);
   }
 }
 
+// Inicializa el formulario y los controles del modal.
 setupPointForm();
 
 const closeModalBtn = document.getElementById("closeModal");
@@ -255,7 +287,3 @@ if (closeModalBtn) {
 if (savePointChangesBtn) {
   savePointChangesBtn.addEventListener("click", saveEditedPoint);
 }
-
-map.on("load", () => {
-  loadPoints();
-});
