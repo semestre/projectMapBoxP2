@@ -346,7 +346,3 @@ if (closeRouteModalBtn) {
 if (saveRouteChangesBtn) {
   saveRouteChangesBtn.addEventListener("click", saveEditedRoute);
 }
-
-map.on("load", () => {
-  loadRoutes();
-});

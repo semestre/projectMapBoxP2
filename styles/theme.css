@@ -1,0 +1,329 @@
+/* ========== THEME SWITCH STYLES ========== */
+.theme-switch-wrapper {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.theme-switch-checkbox {
+  display: none;
+}
+
+.theme-switch {
+  position: relative;
+  width: 60px;
+  height: 34px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(34, 197, 94, 0.6);
+  border-radius: 34px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.theme-switch-checkbox:checked + .theme-switch {
+  background: rgba(74, 222, 128, 0.2);
+  border-color: rgba(74, 222, 128, 0.8);
+}
+
+.theme-switch i {
+  position: absolute;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  color: rgba(34, 197, 94, 0.8);
+}
+
+.icon-moon {
+  left: 6px;
+  opacity: 1;
+}
+
+.icon-sun {
+  right: 6px;
+  opacity: 0;
+}
+
+.theme-switch-checkbox:checked + .theme-switch .icon-moon {
+  opacity: 0;
+  left: -6px;
+}
+
+.theme-switch-checkbox:checked + .theme-switch .icon-sun {
+  opacity: 1;
+  right: 4px;
+  color: #fcd34d;
+}
+
+/* Efecto hover */
+.theme-switch-wrapper:hover .theme-switch {
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+  transform: scale(1.05);
+}
+
+/* ========== DARK MODE - BOTONES DE NAVBAR ========== */
+body.dark-mode .btn-navbar-control {
+  border-color: rgba(74, 222, 128, 0.4);
+  background: rgba(74, 222, 128, 0.1);
+  color: #86efac;
+}
+
+body.dark-mode .btn-navbar-control:hover {
+  background: rgba(74, 222, 128, 0.2);
+  border-color: rgba(74, 222, 128, 0.7);
+  color: #ffffff;
+}
+
+/* ========== DARK MODE STYLES ========== */
+/* Light mode usa los estilos originales de general.css, theme.css y modals.css */
+/* Solo aplicar cambios en dark mode */
+
+/* ========== DARK MODE - GENERAL ========== */
+body.dark-mode {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #e2e8f0;
+}
+
+/* ========== DARK MODE - NAVBAR ========== */
+body.dark-mode .geo-navbar {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f1419 100%);
+}
+
+body.dark-mode .geo-navbar__brand h2 {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+body.dark-mode .nav-tabs .nav-link {
+  color: rgba(226, 232, 240, 0.7);
+}
+
+body.dark-mode .nav-tabs .nav-link:hover {
+  background: rgba(74, 222, 128, 0.1);
+  color: #e2e8f0;
+}
+
+body.dark-mode .nav-tabs .nav-link.active {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  color: #0f172a;
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.2);
+}
+
+/* ========== DARK MODE - PANEL LATERAL ========== */
+body.dark-mode .panel-lateral {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f1419 100%);
+}
+
+body.dark-mode .form-section {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(74, 222, 128, 0.15);
+}
+
+body.dark-mode .form-section h4 {
+  color: #4ade80;
+}
+
+body.dark-mode .form-label {
+  color: #cbd5e1;
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+  background-color: #1e293b;
+  border: 2px solid rgba(74, 222, 128, 0.2);
+  color: #e2e8f0;
+}
+
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
+  background-color: #334155;
+  border-color: #4ade80;
+  box-shadow: 0 0 0 0.3rem rgba(74, 222, 128, 0.15);
+  color: #e2e8f0;
+}
+
+body.dark-mode .form-control::placeholder {
+  color: #64748b;
+}
+
+body.dark-mode .btn-primary {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+}
+
+body.dark-mode .btn-primary:hover {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
+
+/* ========== DARK MODE - LISTAS ========== */
+body.dark-mode .lista-section h5 {
+  color: #4ade80;
+}
+
+body.dark-mode .item-list {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  border-left: 4px solid #4ade80;
+  cursor: pointer;
+}
+
+body.dark-mode .item-list:hover {
+  background: rgba(30, 41, 59, 0.6);
+  border-left-color: #86efac;
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.1);
+}
+
+body.dark-mode .item-info {
+  cursor: pointer;
+}
+
+body.dark-mode .item-list-nombre {
+  color: #e2e8f0;
+}
+
+body.dark-mode .item-list-desc {
+  color: rgba(226, 232, 240, 0.6);
+}
+
+body.dark-mode .text-muted {
+  color: #94a3b8 !important;
+}
+
+/* ========== DARK MODE - BADGES ========== */
+body.dark-mode .badge-success {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+}
+
+body.dark-mode .badge-info {
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+}
+
+body.dark-mode .badge-warning {
+  background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
+}
+
+/* ========== DARK MODE - BOTONES ========== */
+body.dark-mode .btn-sm.btn-info,
+body.dark-mode .btn-edit,
+body.dark-mode .btn-zone-edit,
+body.dark-mode .btn-route-edit {
+  background: rgba(74, 222, 128, 0.2);
+  border: 1px solid rgba(74, 222, 128, 0.5);
+  color: #86efac;
+}
+
+body.dark-mode .btn-sm.btn-info:hover,
+body.dark-mode .btn-edit:hover,
+body.dark-mode .btn-zone-edit:hover,
+body.dark-mode .btn-route-edit:hover {
+  background: rgba(74, 222, 128, 0.4);
+  border-color: rgba(74, 222, 128, 0.8);
+  color: #ffffff;
+}
+
+body.dark-mode .btn-sm.btn-danger,
+body.dark-mode .btn-delete,
+body.dark-mode .btn-delete-zone,
+body.dark-mode .btn-delete-route {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+}
+
+body.dark-mode .btn-sm.btn-danger:hover,
+body.dark-mode .btn-delete:hover,
+body.dark-mode .btn-delete-zone:hover,
+body.dark-mode .btn-delete-route:hover {
+  background: rgba(239, 68, 68, 0.4);
+  border-color: rgba(239, 68, 68, 0.8);
+}
+
+/* ========== DARK MODE - MODAL ========== */
+body.dark-mode .modal-content {
+  background: #1e293b;
+}
+
+body.dark-mode .modal-header {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+  border-bottom: 2px solid rgba(74, 222, 128, 0.2);
+}
+
+body.dark-mode .modal-title {
+  color: #e2e8f0;
+}
+
+body.dark-mode .modal-body {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+body.dark-mode .modal-footer {
+  background: #0f172a;
+  border-top: 2px solid rgba(74, 222, 128, 0.2);
+}
+
+body.dark-mode .modal-body .form-label {
+  color: #cbd5e1;
+}
+
+body.dark-mode .modal-body .form-control {
+  background: #1e293b;
+  border-color: rgba(74, 222, 128, 0.2);
+  color: #e2e8f0;
+}
+
+body.dark-mode .modal-body .form-control:focus {
+  background: #334155;
+  border-color: #4ade80;
+  color: #e2e8f0;
+}
+
+body.dark-mode .modal-footer .btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+body.dark-mode .modal-footer .btn-danger:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+body.dark-mode .modal-footer .btn-success {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+}
+
+body.dark-mode .modal-footer .btn-success:hover {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
+
+/* ========== DARK MODE - SCROLL ========== */
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #86efac 0%, #4ade80 100%);
+}
+
+/* ========== DARK MODE - MAPBOX POPUP ========== */
+body.dark-mode .mapboxgl-popup-content {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #e2e8f0;
+  border: 2px solid #4ade80;
+}
+
+body.dark-mode .mapboxgl-popup-content h3 {
+  color: #4ade80;
+}
+
+body.dark-mode .mapboxgl-popup-content p {
+  color: #cbd5e1;
+}
+
+/* ========== ANIMACIÓN DE TRANSICIÓN SUAVE ========== */
+body.dark-mode {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}

@@ -324,7 +324,3 @@ if (closeZoneModalBtn) {
 if (saveZoneChangesBtn) {
   saveZoneChangesBtn.addEventListener("click", saveEditedZone);
 }
-
-map.on("load", () => {
-  loadZones();
-});
